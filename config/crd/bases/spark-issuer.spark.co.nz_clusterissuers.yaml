@@ -52,6 +52,10 @@ spec:
                 description: Reference to the secret that's holding the login credentials
                   for the REST API
                 type: string
+              hostAliveURL:
+                description: HostAliveURL is the URL to check if the host is reachable
+                  from the cluster
+                type: string
               url:
                 description: |-
                   URL is the REST API login URL for the external issuer to rerieve the session ID
@@ -59,6 +63,7 @@ spec:
                 type: string
             required:
             - authSecretName
+            - hostAliveURL
             - url
             type: object
           status:

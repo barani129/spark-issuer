@@ -1,0 +1,37 @@
+barani@Baranitharans-MacBook-Pro sparkissuer % kubectl get clusterissuers.spark-issuer.spark.co.nz clusterissuer-sample -o json
+{
+    "apiVersion": "spark-issuer.spark.co.nz/v1alpha1",
+    "kind": "ClusterIssuer",
+    "metadata": {
+        "creationTimestamp": "2024-05-12T09:07:30Z",
+        "generation": 1,
+        "labels": {
+            "app.kubernetes.io/managed-by": "kustomize",
+            "app.kubernetes.io/name": "sparkissuer"
+        },
+        "name": "clusterissuer-sample",
+        "resourceVersion": "331553",
+        "uid": "8c6e6982-9688-4e7b-9cb6-1d6686db42fd"
+    },
+    "spec": {
+        "authSecretName": "login",
+        "hostAliveURL": "https://spark-nz-non-prod.appvx.com",
+        "url": "https://spark-nz-non-prod.appvx.com/avxapi/login?gwsource=external"
+    },
+    "status": {
+        "conditions": [
+            {
+                "lastTransitionTime": "2024-05-12T09:07:33Z",
+                "message": "success",
+                "reason": "ClusterIssuerReconciler",
+                "status": "True",
+                "type": "Ready"
+            }
+        ],
+        "lastPollTime": "2024-05-12T09:07:32Z",
+        "sessionID": "spark-nz-non-prod~~bc34d277-3455-46d7-9e07-9ba55172020b"
+    }
+}
+barani@Baranitharans-MacBook-Pro sparkissuer % kubectl get clusterissuers.spark-issuer.spark.co.nz clusterissuer-sample        
+NAME                   TYPE    READYFORSERVING
+clusterissuer-sample   Ready   True
