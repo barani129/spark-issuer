@@ -1,0 +1,10 @@
+apiVersion: spark-issuer.spark.co.nz/v1alpha1
+kind: ClusterIssuer
+metadata:
+  labels:
+    app.kubernetes.io/name: sparkissuer
+    app.kubernetes.io/managed-by: kustomize
+  name: clusterissuer-sample
+spec:
+  authSecretName: "login"
+  url: "https://spark-nz-non-prod.appvx.com/avxapi/login?gwsource=external"
