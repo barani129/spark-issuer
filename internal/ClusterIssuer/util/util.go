@@ -21,7 +21,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -122,7 +121,6 @@ func SetSessionID(status *sparkissuerv1alpha1.ClusterIssuerStatus, username []by
 func CheckServerAliveness(url string) int {
 	resp, err := http.Get(url)
 	if err != nil {
-		log.Println(err)
 		return 0
 	}
 	defer resp.Body.Close()
@@ -147,7 +145,6 @@ func GetServerResponse(username string, password string, url string) (string, er
 	req.Header.Set("username", username)
 	req.Header.Set("password", password)
 	// req.Header.Set("grant_type", "client_credentials")
-	fmt.Println(req)
 	resp, err := client.Do(req)
 	if err != nil {
 		return "", err
