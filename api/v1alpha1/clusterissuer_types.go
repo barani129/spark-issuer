@@ -34,6 +34,9 @@ type ClusterIssuerSpec struct {
 	// example: https://appviewx.com/login
 	URL string `json:"url"`
 
+	// HostAliveURL is the URL to check if the host is reachable from the cluster
+	HostAliveURL string `json:"hostAliveURL"`
+
 	// Reference to the secret that's holding the login credentials for the REST API
 	AuthSecretName string `json:"authSecretName"`
 }

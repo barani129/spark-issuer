@@ -21,6 +21,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -121,6 +122,7 @@ func SetSessionID(status *sparkissuerv1alpha1.ClusterIssuerStatus, username []by
 func CheckServerAliveness(url string) int {
 	resp, err := http.Get(url)
 	if err != nil {
+		log.Println(err)
 		return 0
 	}
 	defer resp.Body.Close()
