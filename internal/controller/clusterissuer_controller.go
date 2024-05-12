@@ -113,14 +113,10 @@ func (r *ClusterIssuerReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 		return ctrl.Result{}, err
 	}
 	var secret corev1.Secret
-
 	if err := r.Get(ctx, secretName, &secret); err != nil {
 		return ctrl.Result{}, fmt.Errorf("%w, secret name: %s, reason: %v", errGetAuthSecret, secretName, err)
 	}
-	code := sparkissuerutil.CheckServerAliveness(issuerSpec.HostAliveURL)
-	if code != 200 {
-		return ctrl.Result{}, fmt.Errorf("remote API server is returning status code %d, please check the connectivity", code)
-	}
+
 	username := secret.Data["username"]
 	password := secret.Data["password"]
 	// report gives feedback by updating the Ready conidtion of the cluster issuer
@@ -135,15 +131,7 @@ func (r *ClusterIssuerReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 		}
 		r.recorder.Event(issuer, eventType, sparkissuerv1alpha1.EventReasonIssuerReconciler, message)
 		sparkissuerutil.SetReadyCondition(issuerStatus, conditionStatus, sparkissuerv1alpha1.EventReasonIssuerReconciler, message)
-		if issuerStatus.LastPollTime == nil {
-			sparkissuerutil.SetSessionID(issuerStatus, username, password, issuerSpec.URL)
-		} else {
-			pastTime := time.Now().Add(-14 * time.Minute)
-			timeDiff := issuerStatus.LastPollTime.Time.Before(pastTime)
-			if timeDiff {
-				sparkissuerutil.SetSessionID(issuerStatus, username, password, issuerSpec.URL)
-			}
-		}
+
 	}
 	defer func() {
 		if err != nil {
@@ -159,7 +147,26 @@ func (r *ClusterIssuerReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 		report(sparkissuerv1alpha1.ConditionUnknown, "First Seen", nil)
 		return ctrl.Result{}, nil
 	}
-
+	code := sparkissuerutil.CheckServerAliveness(issuerSpec.HostAliveURL)
+	if code != 200 {
+		report(sparkissuerv1alpha1.ConditionFalse, "ServerUnreachable", nil)
+		return ctrl.Result{}, fmt.Errorf("remote API server is returning status code %d, please check the connectivity", code)
+	}
+	if issuerStatus.LastPollTime == nil {
+		err := sparkissuerutil.SetSessionID(issuerStatus, username, password, issuerSpec.URL)
+		if err != nil {
+			report(sparkissuerv1alpha1.ConditionFalse, "UnableToSetSessionID", nil)
+		}
+	} else {
+		pastTime := time.Now().Add(-14 * time.Minute)
+		timeDiff := issuerStatus.LastPollTime.Time.Before(pastTime)
+		if timeDiff {
+			err := sparkissuerutil.SetSessionID(issuerStatus, username, password, issuerSpec.URL)
+			if err != nil {
+				report(sparkissuerv1alpha1.ConditionFalse, "UnableToSetSessionID", nil)
+			}
+		}
+	}
 	report(sparkissuerv1alpha1.ConditionTrue, "success", nil)
 	return ctrl.Result{RequeueAfter: defaultHealthCheckInterval}, nil
 }
