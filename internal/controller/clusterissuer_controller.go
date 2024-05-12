@@ -161,6 +161,7 @@ func (r *ClusterIssuerReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 		pastTime := time.Now().Add(-14 * time.Minute)
 		timeDiff := issuerStatus.LastPollTime.Time.Before(pastTime)
 		if timeDiff {
+			log.Log.Info("triggering session ID update as the time elasped")
 			err := sparkissuerutil.SetSessionID(issuerStatus, username, password, issuerSpec.URL)
 			if err != nil {
 				report(sparkissuerv1alpha1.ConditionFalse, "UnableToSetSessionID", nil)
