@@ -35,3 +35,31 @@ barani@Baranitharans-MacBook-Pro sparkissuer % kubectl get clusterissuers.spark-
 barani@Baranitharans-MacBook-Pro sparkissuer % kubectl get clusterissuers.spark-issuer.spark.co.nz clusterissuer-sample        
 NAME                   TYPE    READYFORSERVING
 clusterissuer-sample   Ready   True
+
+
+2024-05-12T21:25:06+12:00	INFO	setup	starting	{"enable-leader-election": false, "metrics-addr": ":8081", "cluster-resource-namespace": "default"}
+2024-05-12T21:25:06+12:00	INFO	setup	starting manager
+2024-05-12T21:25:06+12:00	INFO	controller-runtime.metrics	Starting metrics server
+2024-05-12T21:25:06+12:00	INFO	starting server	{"kind": "health probe", "addr": "[::]:8082"}
+2024-05-12T21:25:06+12:00	INFO	controller-runtime.metrics	Serving metrics server	{"bindAddress": ":8081", "secure": false}
+2024-05-12T21:25:06+12:00	INFO	Starting EventSource	{"controller": "clusterissuer", "controllerGroup": "spark-issuer.spark.co.nz", "controllerKind": "ClusterIssuer", "source": "kind source: *v1alpha1.ClusterIssuer"}
+2024-05-12T21:25:06+12:00	INFO	Starting Controller	{"controller": "clusterissuer", "controllerGroup": "spark-issuer.spark.co.nz", "controllerKind": "ClusterIssuer"}
+2024-05-12T21:25:06+12:00	INFO	Starting workers	{"controller": "clusterissuer", "controllerGroup": "spark-issuer.spark.co.nz", "controllerKind": "ClusterIssuer", "worker count": 1}
+
+
+2024-05-12T21:25:20+12:00	INFO	First Seen
+2024-05-12T21:25:20+12:00	DEBUG	events	First Seen	{"type": "Normal", "object": {"kind":"ClusterIssuer","name":"clusterissuer-sample","uid":"0b97e665-e328-4556-90ef-08243771c2ff","apiVersion":"spark-issuer.spark.co.nz/v1alpha1","resourceVersion":"333698"}, "reason": "ClusterIssuerReconciler"}
+2024-05-12T21:25:23+12:00	INFO	success
+2024-05-12T21:25:23+12:00	DEBUG	events	success	{"type": "Normal", "object": {"kind":"ClusterIssuer","name":"clusterissuer-sample","uid":"0b97e665-e328-4556-90ef-08243771c2ff","apiVersion":"spark-issuer.spark.co.nz/v1alpha1","resourceVersion":"333703"}, "reason": "ClusterIssuerReconciler"}
+2024-05-12T21:25:23+12:00	INFO	success
+2024-05-12T21:25:23+12:00	DEBUG	events	success	{"type": "Normal", "object": {"kind":"ClusterIssuer","name":"clusterissuer-sample","uid":"0b97e665-e328-4556-90ef-08243771c2ff","apiVersion":"spark-issuer.spark.co.nz/v1alpha1","resourceVersion":"333707"}, "reason": "ClusterIssuerReconciler"}
+^C2024-05-12T21:25:37+12:00	INFO	Stopping and waiting for non leader election runnables
+2024-05-12T21:25:37+12:00	INFO	Stopping and waiting for leader election runnables
+2024-05-12T21:25:37+12:00	INFO	Shutdown signal received, waiting for all workers to finish	{"controller": "clusterissuer", "controllerGroup": "spark-issuer.spark.co.nz", "controllerKind": "ClusterIssuer"}
+2024-05-12T21:25:37+12:00	INFO	All workers finished	{"controller": "clusterissuer", "controllerGroup": "spark-issuer.spark.co.nz", "controllerKind": "ClusterIssuer"}
+2024-05-12T21:25:37+12:00	INFO	Stopping and waiting for caches
+2024-05-12T21:25:37+12:00	INFO	Stopping and waiting for webhooks
+2024-05-12T21:25:37+12:00	INFO	Stopping and waiting for HTTP servers
+2024-05-12T21:25:37+12:00	INFO	controller-runtime.metrics	Shutting down metrics server with timeout of 1 minute
+2024-05-12T21:25:37+12:00	INFO	shutting down server	{"kind": "health probe", "addr": "[::]:8082"}
+2024-05-12T21:25:37+12:00	INFO	Wait completed, proceeding to shutdown the manager
