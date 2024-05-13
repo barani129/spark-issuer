@@ -18,7 +18,10 @@ package main
 
 import (
 	"crypto/tls"
+	"errors"
 	"flag"
+	"fmt"
+	"io/ioutil"
 	"os"
 
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
@@ -43,6 +46,8 @@ var (
 	setupLog = ctrl.Log.WithName("setup")
 )
 
+const inClusterNamespacePath = "/var/run/secrets/kubernetes.io/serviceaccount/namespace"
+
 func init() {
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
 
@@ -59,7 +64,7 @@ func main() {
 	var clusterResourceNamespace string
 	flag.StringVar(&metricsAddr, "metrics-bind-address", ":8081", "The address the metric endpoint binds to.")
 	flag.StringVar(&probeAddr, "health-probe-bind-address", ":8082", "The address the probe endpoint binds to.")
-	flag.StringVar(&clusterResourceNamespace, "cluster-resource-namespace", "default", "the namespace for clusterissuer secret")
+	flag.StringVar(&clusterResourceNamespace, "cluster-resource-namespace", "", "the namespace for clusterissuer secret")
 	flag.BoolVar(&enableLeaderElection, "leader-elect", false,
 		"Enable leader election for controller manager. "+
 			"Enabling this will ensure there is only one active controller manager.")
@@ -74,6 +79,19 @@ func main() {
 	flag.Parse()
 
 	ctrl.SetLogger(zap.New(zap.UseFlagOptions(&opts)))
+
+	if clusterResourceNamespace == "" {
+		var err error
+		clusterResourceNamespace, err = getInClusterNamespace()
+		if err != nil {
+			if errors.Is(err, errNotInCluster) {
+				setupLog.Error(err, "please supply --cluster-resource-namespace")
+			} else {
+				setupLog.Error(err, "unexpected error while getting in-cluster Namespace")
+			}
+			os.Exit(1)
+		}
+	}
 
 	// if the enable-http2 flag is false (the default), http/2 should be disabled
 	// due to its vulnerabilities. More specifically, disabling http/2 will
@@ -153,4 +171,25 @@ func main() {
 		setupLog.Error(err, "problem running manager")
 		os.Exit(1)
 	}
+}
+
+var errNotInCluster = errors.New("not running in-cluster")
+
+// Copied from controller-runtime/pkg/leaderelection
+func getInClusterNamespace() (string, error) {
+	// Check whether the namespace file exists.
+	// If not, we are not running in cluster so can't guess the namespace.
+	_, err := os.Stat(inClusterNamespacePath)
+	if os.IsNotExist(err) {
+		return "", errNotInCluster
+	} else if err != nil {
+		return "", fmt.Errorf("error checking namespace file: %w", err)
+	}
+
+	// Load the namespace file and return its content
+	namespace, err := ioutil.ReadFile(inClusterNamespacePath)
+	if err != nil {
+		return "", fmt.Errorf("error reading namespace file: %w", err)
+	}
+	return string(namespace), nil
 }
