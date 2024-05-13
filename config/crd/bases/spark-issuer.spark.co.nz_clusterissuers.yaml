@@ -16,12 +16,12 @@ spec:
   versions:
   - additionalPrinterColumns:
     - description: whether clusterissuer is ready to serve
-      jsonPath: .status.conditions[].type
-      name: Type
-      type: string
-    - description: whether clusterissuer is ready to serve
       jsonPath: .status.conditions[].status
-      name: ReadyForServing
+      name: Ready
+      type: string
+    - description: object creation timestamp(in cluster's timezone)
+      jsonPath: .metadata.creationTimestamp
+      name: CreatedAt
       type: string
     name: v1alpha1
     schema:
