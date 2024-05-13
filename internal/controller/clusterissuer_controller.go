@@ -110,8 +110,9 @@ func (r *ClusterIssuerReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 		secretName.Namespace = r.ClusterResourceNamespace
 	default:
 		log.Log.Error(fmt.Errorf("unexpected issuer type: %s", issuer), "not retrying")
-		return ctrl.Result{}, err
+		return ctrl.Result{}, nil
 	}
+
 	var secret corev1.Secret
 	if err := r.Get(ctx, secretName, &secret); err != nil {
 		return ctrl.Result{}, fmt.Errorf("%w, secret name: %s, reason: %v", errGetAuthSecret, secretName, err)
@@ -131,7 +132,6 @@ func (r *ClusterIssuerReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 		}
 		r.recorder.Event(issuer, eventType, sparkissuerv1alpha1.EventReasonIssuerReconciler, message)
 		sparkissuerutil.SetReadyCondition(issuerStatus, conditionStatus, sparkissuerv1alpha1.EventReasonIssuerReconciler, message)
-
 	}
 	defer func() {
 		if err != nil {
@@ -147,15 +147,11 @@ func (r *ClusterIssuerReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 		report(sparkissuerv1alpha1.ConditionUnknown, "First Seen", nil)
 		return ctrl.Result{}, nil
 	}
-	code := sparkissuerutil.CheckServerAliveness(issuerSpec.HostAliveURL)
-	if code != 200 {
-		report(sparkissuerv1alpha1.ConditionFalse, "ServerUnreachable", nil)
-		return ctrl.Result{}, fmt.Errorf("remote API server is returning status code %d, please check the connectivity", code)
-	}
+
 	if issuerStatus.LastPollTime == nil {
 		err := sparkissuerutil.SetSessionID(issuerStatus, username, password, issuerSpec.URL)
 		if err != nil {
-			report(sparkissuerv1alpha1.ConditionFalse, "UnableToSetSessionID", nil)
+			return ctrl.Result{}, fmt.Errorf("%s", err)
 		}
 	} else {
 		pastTime := time.Now().Add(-14 * time.Minute)
@@ -164,7 +160,12 @@ func (r *ClusterIssuerReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 			log.Log.Info("triggering session ID update as the time elasped")
 			err := sparkissuerutil.SetSessionID(issuerStatus, username, password, issuerSpec.URL)
 			if err != nil {
-				report(sparkissuerv1alpha1.ConditionFalse, "UnableToSetSessionID", nil)
+				return ctrl.Result{}, fmt.Errorf("%s", err)
+			}
+		} else {
+			code := sparkissuerutil.CheckServerAliveness(issuerSpec.HostAliveURL)
+			if code != 200 {
+				return ctrl.Result{}, fmt.Errorf("remote API server is returning status code %d, please check the connectivity", code)
 			}
 		}
 	}

@@ -7,5 +7,5 @@ metadata:
   name: clusterissuer-sample
 spec:
   authSecretName: "login"
-  url: "https://spark-nz-non-prod.appvx.com/avxapi/login?gwsource=external"
+  url: "https://sparkee-nz-non-prod.appvx.com/avxapi/login?gwsource=external"
   hostAliveURL: "https://spark-nz-non-prod.appvx.com"
