@@ -63,8 +63,8 @@ type ClusterIssuerStatus struct {
 //+kubebuilder:resource:scope=Cluster
 
 // ClusterIssuer is the Schema for the clusterissuers API
-// +kubebuilder:printcolumn:name="Type",type="string",JSONPath=".status.conditions[].type",description="whether clusterissuer is ready to serve"
-// +kubebuilder:printcolumn:name="ReadyForServing",type="string",JSONPath=".status.conditions[].status",description="whether clusterissuer is ready to serve"
+// +kubebuilder:printcolumn:name="Ready",type="string",JSONPath=".status.conditions[].status",description="whether clusterissuer is ready to serve"
+// +kubebuilder:printcolumn:name="CreatedAt",type="string",JSONPath=".metadata.creationTimestamp",description="object creation timestamp(in cluster's timezone)"
 type ClusterIssuer struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
